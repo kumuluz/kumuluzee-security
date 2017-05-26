@@ -14,6 +14,10 @@
 
     <artifactId>kumuluzee-security-keycloak</artifactId>
 
+    <properties>
+        <keycloak.version>3.1.0.Final</keycloak.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.kumuluz.ee</groupId>
@@ -22,8 +26,30 @@
         </dependency>
         <dependency>
             <groupId>com.kumuluz.ee</groupId>
+            <artifactId>kumuluzee-servlet-jetty</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.kumuluz.ee</groupId>
             <artifactId>kumuluzee-cdi-weld</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.kumuluz.ee.security</groupId>
+            <artifactId>kumuluzee-security-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-jetty92-adapter-dist</artifactId>
+            <version>${keycloak.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
         </dependency>
     </dependencies>
 
