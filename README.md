@@ -1,4 +1,5 @@
 # KumuluzEE Security
+[![Build Status](https://img.shields.io/travis/kumuluz/kumuluzee-security/master.svg?style=flat)](https://travis-ci.org/kumuluz/kumuluzee-security)
 
 > KumuluzEE Security extension for the Kumuluz EE microservice framework. 
 
