@@ -3,8 +3,10 @@
 
 > KumuluzEE Security extension for the Kumuluz EE microservice framework. 
 
-KumuluzEE Security is a security extension for the KumuluzEE microservice framework. It provides support for OpenID authentication through standard Java EE security annotations for roles. It is specifically targeted towards securing REST services. Roles are mapped to the selected OpenID provider.   
-KumuluzEE Security has been designed to work with different OpenID providers. Currently, Keycloak is supported. Contributions for other OpenID providers are welcome.
+KumuluzEE Security is a security extension for the KumuluzEE microservice framework. It provides support for OpenID 
+authentication through standard Java EE security annotations for roles. It is specifically targeted towards securing 
+REST services. Roles are mapped to the selected OpenID provider. KumuluzEE Security has been designed to work with 
+different OpenID providers. Currently only Keycloak is supported. Contributions for other OpenID providers are welcome.
 
 ## Usage
 
@@ -19,10 +21,12 @@ You can enable the KumuluzEE Security authentication with Keycloak by adding the
 
 ### Security configuration
 
-To protect a REST service using KumuluzEE Security authentication you have to annotate the REST application class with the `@DeclareRoles` annotation. When using the `@DeclareRoles` annotation the Keycloak configuration (**keycloak.json**) has to be
-provided with configuration key `kumuluzee.security.keycloak.json`. The configuration key can be defined as an environment variable, file property or config server entry (if using the KumuluzEE Config extension with support for etcd/Consul). Please refer to KumuluzEE Config for more information. 
-Optionally you can override the configuration in the code using the `@Keycloak`
-annotation. 
+To protect a REST service using KumuluzEE Security authentication you have to annotate the REST application class with 
+the `@DeclareRoles` annotation. When using the `@DeclareRoles` annotation the Keycloak configuration (**keycloak.json**) 
+has to be provided with configuration key `kumuluzee.security.keycloak.json`. The configuration key can be defined as 
+an environment variable, file property or config server entry (if using the KumuluzEE Config extension with support for 
+etcd/Consul). Please refer to KumuluzEE Config for more information. Optionally you can override the configuration in 
+the code using the `@Keycloak` annotation. 
 
 Example of security configuration with configuration override:
 ```java
@@ -66,11 +70,11 @@ public class CustomerResource {
 }
 ```
 
-**NOTE**: When using the non CDI security constraint annotations note that these constraints behave as if they were declared in 
-the **web.xml** descriptor, i.e. the url patterns do not support path parameters.
+**NOTE**: When using the non CDI security constraint annotations note that these constraints behave as if they were 
+declared in the **web.xml** descriptor, i.e. the url patterns do not support path parameters.
 
 The security extension also supports CDI based security, which means that security constraints are checked and resolved 
-during method invocation. To enable CDI based security just add `@Secured` annotation to the CDI bean and use the 
+during method invocation. To enable CDI based security just add `@Secure` annotation to the CDI bean and use the 
 standard Java security annotations as before.
 
 Example of CDI based security:
