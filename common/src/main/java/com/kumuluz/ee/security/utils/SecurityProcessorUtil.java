@@ -27,6 +27,8 @@ import java.util.List;
  */
 public interface SecurityProcessorUtil {
 
+    void processAuthentication();
+
     void processDenyAll();
 
     void processRolesAllowed(List<String> rolesAllowed);

@@ -44,6 +44,13 @@ public class KeycloakSecurityProcessorUtilImpl implements SecurityProcessorUtil 
     private HttpServletRequest httpServletRequest;
 
     @Override
+    public void processAuthentication() {
+        Principal principal = httpServletRequest.getUserPrincipal();
+        if (principal == null)
+            throw new NotAuthorizedException(Response.status(401).build());
+    }
+
+    @Override
     public void processDenyAll() {
         Principal principal = httpServletRequest.getUserPrincipal();
         if (principal == null)

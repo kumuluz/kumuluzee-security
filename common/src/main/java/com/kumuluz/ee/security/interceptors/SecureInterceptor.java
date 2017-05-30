@@ -50,15 +50,16 @@ public class SecureInterceptor {
     @AroundInvoke
     public Object checkPermission(InvocationContext context) throws Exception {
         Object securityAnnotation = SecurityAnnotationHelper.getSecurityAnnotation(context.getMethod());
-        if (securityAnnotation == null)
-            return context.proceed();
-
-        if (securityAnnotation instanceof DenyAll) {
-            securityProcessorUtil.processDenyAll();
-        } else if (securityAnnotation instanceof RolesAllowed) {
-            securityProcessorUtil.processRolesAllowed(SecurityAnnotationHelper.getRolesAllowed(context.getMethod()));
-        } else if (securityAnnotation instanceof PermitAll) {
-            securityProcessorUtil.processPermitAll();
+        if (securityAnnotation == null) {
+            securityProcessorUtil.processAuthentication();
+        } else {
+            if (securityAnnotation instanceof DenyAll) {
+                securityProcessorUtil.processDenyAll();
+            } else if (securityAnnotation instanceof RolesAllowed) {
+                securityProcessorUtil.processRolesAllowed(SecurityAnnotationHelper.getRolesAllowed(context.getMethod()));
+            } else if (securityAnnotation instanceof PermitAll) {
+                securityProcessorUtil.processPermitAll();
+            }
         }
 
         return context.proceed();
