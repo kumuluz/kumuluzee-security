@@ -20,7 +20,7 @@ You can enable the KumuluzEE Security authentication with Keycloak by adding the
 ### Security configuration
 
 To protect a REST service using KumuluzEE Security authentication you have to annotate the REST application class with the `@DeclareRoles` annotation. When using the `@DeclareRoles` annotation the Keycloak configuration (**keycloak.json**) has to be
-provided with configuration key `kumuluzee.security.keycloak.config`. The configuration key can be defined as an environment variable, file property or config server entry (if using the KumuluzEE Config extension with support for etcd/Consul). Please refer to KumuluzEE Config for more information. 
+provided with configuration key `kumuluzee.security.keycloak.json`. The configuration key can be defined as an environment variable, file property or config server entry (if using the KumuluzEE Config extension with support for etcd/Consul). Please refer to KumuluzEE Config for more information. 
 Optionally you can override the configuration in the code using the `@Keycloak`
 annotation. 
 
@@ -61,6 +61,29 @@ public class CustomerResource {
     @POST
     @RolesAllowed("user")
     public Response addNewCustomer(Customer customer) {
+        ...
+    }
+}
+```
+
+The security extension also supports CDI based security, which means that security constraints are checked and resolved 
+during method invocation. To enable CDI based security just add `@Secured` annotation to the CDI bean and use the 
+standard Java security annotations as before.
+
+Example of CDI based security:
+```java
+@RequestScoped
+@Secure
+@PermitAll
+public class CustomerResource {
+
+    @RolesAllowed("user")
+    public Customer getCustomer(String customerId) {
+        ...
+    }
+
+    @RolesAllowed("admin")
+    public void addNewCustomer(Customer customer) {
         ...
     }
 }
