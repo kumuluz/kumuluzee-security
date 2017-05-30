@@ -4,8 +4,6 @@
        bean-discovery-mode="annotated">
 
     <interceptors>
-        <class>com.kumuluz.ee.security.interceptors.DenyAllInterceptor</class>
-        <class>com.kumuluz.ee.security.interceptors.RolesAllowedInterceptor</class>
-        <class>com.kumuluz.ee.security.interceptors.PermitAllInterceptor</class>
+        <class>com.kumuluz.ee.security.interceptors.SecureInterceptor</class>
     </interceptors>
 </beans>

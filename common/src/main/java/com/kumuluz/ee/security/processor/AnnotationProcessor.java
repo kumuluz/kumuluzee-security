@@ -1,9 +1,16 @@
 package com.kumuluz.ee.security.processor;
 
-import com.kumuluz.ee.security.annotations.*;
+import com.kumuluz.ee.security.annotations.Keycloak;
+import com.kumuluz.ee.security.annotations.Secure;
 
-import javax.annotation.processing.*;
-import javax.enterprise.context.*;
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.security.DeclareRoles;
+import javax.annotation.security.DenyAll;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -79,20 +86,15 @@ public class AnnotationProcessor extends AbstractProcessor {
     private void extractElementName(Set<String> elementNames, Element element) {
         ElementKind elementKind = element.getKind();
 
-        if (elementKind.equals(ElementKind.CLASS) && !isCDIBean(element)) {
+        if (elementKind.equals(ElementKind.CLASS) && !isCdiSecurityEnabled(element)) {
             elementNames.add(element.toString());
-        } else if (elementKind.equals(ElementKind.METHOD) && !isCDIBean(element.getEnclosingElement())) {
+        } else if (elementKind.equals(ElementKind.METHOD) && !isCdiSecurityEnabled(element.getEnclosingElement())) {
             elementNames.add(element.getEnclosingElement().toString());
         }
     }
 
-    private boolean isCDIBean(Element element) {
-        return element.getAnnotation(RequestScoped.class) != null ||
-               element.getAnnotation(SessionScoped.class) != null ||
-               element.getAnnotation(RequestScoped.class) != null ||
-               element.getAnnotation(ApplicationScoped.class) != null ||
-               element.getAnnotation(Dependent.class) != null ||
-               element.getAnnotation(ConversationScoped.class) != null;
+    private boolean isCdiSecurityEnabled(Element element) {
+        return element.getAnnotation(Secure.class) != null;
     }
 
     private void writeFile(Set<String> content, String resourceName) throws IOException {

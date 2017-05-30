@@ -1,60 +1,48 @@
 package com.kumuluz.ee.security.utils;
 
-import com.kumuluz.ee.security.annotations.DenyAll;
-import com.kumuluz.ee.security.annotations.PermitAll;
-import com.kumuluz.ee.security.annotations.RolesAllowed;
-
-import javax.interceptor.InvocationContext;
+import javax.annotation.security.DenyAll;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by Benjamin on 29. maj 2017.
+ * @author Benjamin Kastelic
  */
 public class SecurityAnnotationHelper {
 
     public final static String SECURITY_PROCESSED = "com.kumuluz.ee.security.processed";
 
-    public static boolean hasDenyAllOverride(Method method) {
-        return method.getAnnotation(DenyAll.class) != null;
+    public static Object getSecurityAnnotation(Method method) {
+        if (method.getAnnotation(DenyAll.class) != null) // method level @DenyAll annotation
+            return method.getAnnotation(DenyAll.class);
+        if (method.getAnnotation(RolesAllowed.class) != null) // method level @RolesAllowed annotation
+            return method.getAnnotation(RolesAllowed.class);
+        if (method.getAnnotation(PermitAll.class) != null) // method level @PermitAll annotation
+            return method.getAnnotation(PermitAll.class);
+        if (method.getAnnotation(DenyAll.class) != null) // class level @DenyAll annotation
+            return method.getAnnotation(DenyAll.class);
+        if (method.getAnnotation(RolesAllowed.class) != null) // class level @RolesAllowed annotation
+            return method.getAnnotation(RolesAllowed.class);
+        if (method.getAnnotation(PermitAll.class) != null) // class level @PermitAll annotation
+            return method.getAnnotation(PermitAll.class);
+
+        return null; // no security annotation present
     }
 
-    public static boolean hasRolesAllowedOverride(Method method) {
-        return method.getAnnotation(RolesAllowed.class) != null;
-    }
-
-    public static boolean hasPermitAllOverride(Method method) {
-        return method.getAnnotation(PermitAll.class) != null;
-    }
-
-    public static List<String> getRolesAllowed(InvocationContext context) {
+    public static List<String> getRolesAllowed(Method method) {
         List<String> rolesAllowed = new ArrayList<>();
 
-        RolesAllowed rolesAllowedAnnotation = context.getMethod().getAnnotation(RolesAllowed.class) != null
-                ? context.getMethod().getAnnotation(RolesAllowed.class)
-                : context.getMethod().getDeclaringClass().getAnnotation(RolesAllowed.class);
+        RolesAllowed rolesAllowedAnnotation = method.getAnnotation(RolesAllowed.class) != null
+                ? method.getAnnotation(RolesAllowed.class)
+                : method.getDeclaringClass().getAnnotation(RolesAllowed.class);
 
         if (rolesAllowedAnnotation != null) {
             rolesAllowed = Arrays.asList(rolesAllowedAnnotation.value());
         }
 
         return rolesAllowed;
-    }
-
-    public static void setSecurityProcessed(InvocationContext context) {
-        if (context.getContextData() != null) {
-            context.getContextData().put(SECURITY_PROCESSED, "true");
-        }
-    }
-
-    public static boolean isSecurityProcessed(InvocationContext context) {
-        if (context.getContextData() != null) {
-            Object value = context.getContextData().get(SECURITY_PROCESSED);
-            return value != null && value.equals("true");
-        }
-
-        return false;
     }
 }

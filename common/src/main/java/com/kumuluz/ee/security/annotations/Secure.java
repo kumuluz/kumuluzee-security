@@ -7,12 +7,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Custom DenyAll annotation. Behaves just like the standard Java DenyAll annotation.
+ * Custom annotation that enables security on CDI beans.
  *
  * @author Benjamin Kastelic
  */
 @InterceptorBinding
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
-public @interface DenyAll {
+@Target(ElementType.TYPE)
+public @interface Secure {
 }

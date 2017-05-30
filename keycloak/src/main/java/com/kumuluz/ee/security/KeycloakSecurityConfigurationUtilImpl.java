@@ -56,19 +56,19 @@ public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurat
         return constraintMappings;
     }
 
-    private ConstraintMapping toConstraintMapping(SecurityConstraint constraint) {
-        Constraint constraint1 = new Constraint();
-        if (constraint.getAnyRole()) {
-            constraint1.setRoles(new String[]{"*"});
+    private ConstraintMapping toConstraintMapping(SecurityConstraint securityConstraint) {
+        Constraint constraint = new Constraint();
+        if (securityConstraint.getAnyRole()) {
+            constraint.setRoles(new String[]{"*"});
         } else {
-            constraint1.setRoles(constraint.getRoles().toArray(new String[constraint.getRoles().size()]));
+            constraint.setRoles(securityConstraint.getRoles().toArray(new String[securityConstraint.getRoles().size()]));
         }
-        constraint1.setAuthenticate(true);
+        constraint.setAuthenticate(true);
 
         ConstraintMapping constraintMapping = new ConstraintMapping();
-        constraintMapping.setMethod(constraint.getMethod());
-        constraintMapping.setPathSpec(constraint.getPath());
-        constraintMapping.setConstraint(constraint1);
+        constraintMapping.setMethod(securityConstraint.getMethod());
+        constraintMapping.setPathSpec(securityConstraint.getPath());
+        constraintMapping.setConstraint(constraint);
 
         return constraintMapping;
     }

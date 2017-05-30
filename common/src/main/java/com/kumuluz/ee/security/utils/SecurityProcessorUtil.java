@@ -1,10 +1,9 @@
 package com.kumuluz.ee.security.utils;
 
-import java.security.Principal;
 import java.util.List;
 
 /**
- * Created by Benjamin on 29. maj 2017.
+ * @author Benjamin Kastelic
  */
 public interface SecurityProcessorUtil {
 
