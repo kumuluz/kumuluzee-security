@@ -66,6 +66,9 @@ public class CustomerResource {
 }
 ```
 
+**NOTE**: When using the non CDI security constraint annotations note that these constraints behave as if they were declared in 
+the **web.xml** descriptor, i.e. the url patterns do not support path parameters.
+
 The security extension also supports CDI based security, which means that security constraints are checked and resolved 
 during method invocation. To enable CDI based security just add `@Secured` annotation to the CDI bean and use the 
 standard Java security annotations as before.
@@ -87,10 +90,7 @@ public class CustomerResource {
         ...
     }
 }
-```
-
-**NOTE**: When using the security constraint annotations note that these constraints behave as if they were declared in 
-the **web.xml** descriptor, i.e. the url patterns do not support path parameters. 
+``` 
 
 ## Changelog
 <!--- TODO --->
