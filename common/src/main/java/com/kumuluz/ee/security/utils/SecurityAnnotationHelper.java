@@ -33,8 +33,6 @@ import java.util.List;
  */
 public class SecurityAnnotationHelper {
 
-    public final static String SECURITY_PROCESSED = "com.kumuluz.ee.security.processed";
-
     public static Object getSecurityAnnotation(Method method) {
         if (method.getAnnotation(DenyAll.class) != null) // method level @DenyAll annotation
             return method.getAnnotation(DenyAll.class);
