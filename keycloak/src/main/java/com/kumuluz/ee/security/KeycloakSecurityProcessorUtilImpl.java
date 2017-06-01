@@ -35,7 +35,7 @@ import java.security.Principal;
 import java.util.List;
 
 /**
- * Created by Benjamin on 29. maj 2017.
+ * @author Benjamin Kastelic
  */
 @RequestScoped
 public class KeycloakSecurityProcessorUtilImpl implements SecurityProcessorUtil {
@@ -47,23 +47,23 @@ public class KeycloakSecurityProcessorUtilImpl implements SecurityProcessorUtil 
     public void processAuthentication() {
         Principal principal = httpServletRequest.getUserPrincipal();
         if (principal == null)
-            throw new NotAuthorizedException(Response.status(401).build());
+            throw new NotAuthorizedException(Response.status(Response.Status.UNAUTHORIZED).build());
     }
 
     @Override
     public void processDenyAll() {
         Principal principal = httpServletRequest.getUserPrincipal();
         if (principal == null)
-            throw new NotAuthorizedException(Response.status(401).build());
+            throw new NotAuthorizedException(Response.status(Response.Status.UNAUTHORIZED).build());
 
-        throw new ForbiddenException(Response.status(403).build());
+        throw new ForbiddenException(Response.status(Response.Status.FORBIDDEN).build());
     }
 
     @Override
     public void processRolesAllowed(List<String> rolesAllowed) {
         Principal principal = httpServletRequest.getUserPrincipal();
         if (principal == null)
-            throw new NotAuthorizedException(Response.status(401).build());
+            throw new NotAuthorizedException(Response.status(Response.Status.UNAUTHORIZED).build());
 
         KeycloakPrincipal<?> keycloakPrincipal = (KeycloakPrincipal<?>) principal;
         KeycloakSecurityContext keycloakSecurityContext = keycloakPrincipal.getKeycloakSecurityContext();
@@ -72,13 +72,13 @@ public class KeycloakSecurityProcessorUtilImpl implements SecurityProcessorUtil 
 
         boolean isAllowed = rolesAllowed.stream().anyMatch(access::isUserInRole);
         if (!isAllowed)
-            throw new ForbiddenException(Response.status(403).build());
+            throw new ForbiddenException(Response.status(Response.Status.FORBIDDEN).build());
     }
 
     @Override
     public void processPermitAll() {
         Principal principal = httpServletRequest.getUserPrincipal();
         if (principal == null)
-            throw new NotAuthorizedException(Response.status(401).build());
+            throw new NotAuthorizedException(Response.status(Response.Status.UNAUTHORIZED).build());
     }
 }

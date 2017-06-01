@@ -20,12 +20,16 @@
  */
 package com.kumuluz.ee.security;
 
+import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.security.annotations.Keycloak;
 import com.kumuluz.ee.security.models.SecurityConstraint;
 import com.kumuluz.ee.security.utils.SecurityConfigurationUtil;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.keycloak.adapters.jetty.KeycloakJettyAuthenticator;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -41,7 +45,9 @@ import java.util.Set;
 public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurationUtil {
 
     @Override
-    public void configureSecurity(String keycloakConfig, Object context, List<String> declaredRoles, List<SecurityConstraint> constraints) {
+    public void configureSecurity(Class targetClass, Object context, List<String> declaredRoles, List<SecurityConstraint> constraints) {
+        String keycloakConfig = getKeycloakConfig(targetClass);
+
         WebAppContext.Context webAppContext = null;
         WebAppContext webAppContextHandler = null;
 
@@ -68,6 +74,50 @@ public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurat
         if (webAppContext != null) {
             webAppContext.setInitParameter("org.keycloak.json.adapterConfig", keycloakConfig);
         }
+    }
+
+    private String getKeycloakConfig(Class targetClass) {
+        ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
+
+        Keycloak keycloakAnnotation = (Keycloak) targetClass.getAnnotation(Keycloak.class);
+
+        String jsonString = "";
+        JSONObject json;
+        String authServerUrl = "";
+        String sslRequired = "";
+
+        if (keycloakAnnotation != null) {
+            jsonString = keycloakAnnotation.json();
+            authServerUrl = keycloakAnnotation.authServerUrl();
+            sslRequired = keycloakAnnotation.sslRequired();
+        }
+
+        if (jsonString.isEmpty()) {
+            jsonString = configurationUtil.get("kumuluzee.security.keycloak.json").orElse("{}");
+            json = toJSONObject(jsonString);
+        } else {
+            json = toJSONObject(jsonString);
+        }
+
+        if (!authServerUrl.isEmpty()) {
+            json.put("auth-server-url", authServerUrl);
+        }
+
+        if (!sslRequired.isEmpty()) {
+            json.put("ssl-required", sslRequired);
+        }
+
+        return json.toString();
+    }
+
+    private JSONObject toJSONObject(String jsonString) {
+        JSONObject json;
+        try {
+            json = new JSONObject(jsonString);
+        } catch (JSONException e) {
+            json = new JSONObject();
+        }
+        return json;
     }
 
     private List<ConstraintMapping> toConstraintMappings(List<SecurityConstraint> constraints) {

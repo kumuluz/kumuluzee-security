@@ -29,5 +29,5 @@ import java.util.List;
  */
 public interface SecurityConfigurationUtil {
 
-    void configureSecurity(String config, Object context, List<String> declaredRoles, List<SecurityConstraint> constraints);
+    void configureSecurity(Class targetClass, Object context, List<String> declaredRoles, List<SecurityConstraint> constraints);
 }

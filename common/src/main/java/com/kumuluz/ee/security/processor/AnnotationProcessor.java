@@ -39,9 +39,8 @@ import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 /**
  * Compile-time annotation processor for DeclareRoles, RolesAllowed, PermitAll and DenyAll annotations. Generates service file.
@@ -52,7 +51,9 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     private Filer filer;
 
-    // clases with @DeclareRoles annotation
+    private List<Class<? extends Annotation>> securityProviders = Arrays.asList(Keycloak.class);
+
+    // classes with @DeclareRoles annotation
     private Set<String> roleElementNames = new HashSet<>();
 
     // classes with @RolesAllowed, @PermitAll and @DenyAll annotations
@@ -76,8 +77,12 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnvironment) {
-        Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(Keycloak.class);
-        elements.forEach(element -> extractElementName(roleElementNames, element));
+        Set<? extends Element> elements;
+
+        for (Class<? extends Annotation> securityProvider : securityProviders) {
+            elements = roundEnvironment.getElementsAnnotatedWith(securityProvider);
+            elements.forEach(element -> extractElementName(roleElementNames, element));
+        }
 
         elements = roundEnvironment.getElementsAnnotatedWith(DeclareRoles.class);
         elements.forEach(element -> extractElementName(roleElementNames, element));

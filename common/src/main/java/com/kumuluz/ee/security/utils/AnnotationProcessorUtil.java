@@ -20,11 +20,7 @@
  */
 package com.kumuluz.ee.security.utils;
 
-import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
-import com.kumuluz.ee.security.annotations.Keycloak;
 import com.kumuluz.ee.security.models.SecurityConstraint;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import javax.annotation.security.DeclareRoles;
 import javax.annotation.security.DenyAll;
@@ -65,46 +61,13 @@ public class AnnotationProcessorUtil {
         for (Application application : applications) {
             List<String> declaredRoles = getDeclaredRoles(application.getClass());
             List<SecurityConstraint> constraints = getConstraints(application.getClass());
-            configureSecurity(application.getClass(), context, declaredRoles, constraints);
+
+            Class targetClass = application.getClass();
+            if (targetClassIsProxied(targetClass)) {
+                targetClass = targetClass.getSuperclass();
+            }
+            securityConfigurationUtil.configureSecurity(targetClass, context, declaredRoles, constraints);
         }
-    }
-
-    private void configureSecurity(Class targetClass, Object context, List<String> declaredRoles, List<SecurityConstraint> constraints) {
-        ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
-
-        if (targetClassIsProxied(targetClass)) {
-            targetClass = targetClass.getSuperclass();
-        }
-
-        Keycloak keycloakAnnotation = (Keycloak) targetClass.getAnnotation(Keycloak.class);
-
-        String jsonString = "";
-        JSONObject json;
-        String authServerUrl = "";
-        String sslRequired = "";
-
-        if (keycloakAnnotation != null) {
-            jsonString = keycloakAnnotation.json();
-            authServerUrl = keycloakAnnotation.authServerUrl();
-            sslRequired = keycloakAnnotation.sslRequired();
-        }
-
-        if (jsonString.isEmpty()) {
-            jsonString = configurationUtil.get("kumuluzee.security.keycloak.json").orElse("{}");
-            json = toJSONObject(jsonString);
-        } else {
-            json = toJSONObject(jsonString);
-        }
-
-        if (!authServerUrl.isEmpty()) {
-            json.put("auth-server-url", authServerUrl);
-        }
-
-        if (!sslRequired.isEmpty()) {
-            json.put("ssl-required", sslRequired);
-        }
-
-        securityConfigurationUtil.configureSecurity(json.toString(), context, declaredRoles, constraints);
     }
 
     private List<String> getDeclaredRoles(Class<?> applicationClass) {
@@ -115,9 +78,7 @@ public class AnnotationProcessorUtil {
         Set<String> declaredRoles = new HashSet<>();
 
         DeclareRoles[] annotations = applicationClass.getAnnotationsByType(DeclareRoles.class);
-        Arrays.asList(annotations).forEach(annotation -> {
-            declaredRoles.addAll(Arrays.asList(annotation.value()));
-        });
+        Arrays.asList(annotations).forEach(annotation -> declaredRoles.addAll(Arrays.asList(annotation.value())));
 
         return new ArrayList<>(declaredRoles);
     }
@@ -239,16 +200,6 @@ public class AnnotationProcessorUtil {
 
     private String replaceParameters(String path) {
         return path.replaceAll("\\{.*", "*");
-    }
-
-    private JSONObject toJSONObject(String jsonString) {
-        JSONObject json;
-        try {
-            json = new JSONObject(jsonString);
-        } catch (JSONException e) {
-            json = new JSONObject();
-        }
-        return json;
     }
 
     private List<Class<?>> getResourceClasses(Class applicationClass) {
