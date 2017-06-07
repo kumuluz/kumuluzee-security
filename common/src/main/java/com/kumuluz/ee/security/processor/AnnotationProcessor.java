@@ -37,8 +37,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
@@ -96,13 +95,11 @@ public class AnnotationProcessor extends AbstractProcessor {
         elements = roundEnvironment.getElementsAnnotatedWith(DenyAll.class);
         elements.forEach(element -> extractElementName(constraintElementNames, element));
 
-        if (roundEnvironment.processingOver()) {
-            try {
-                writeFile(roleElementNames, "META-INF/services/javax.ws.rs.core.Application");
-                writeFile(constraintElementNames, "META-INF/resources/java.lang.Object");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            writeFile(roleElementNames, "META-INF/services/javax.ws.rs.core.Application");
+            writeFile(constraintElementNames, "META-INF/resources/java.lang.Object");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return true;
@@ -123,15 +120,52 @@ public class AnnotationProcessor extends AbstractProcessor {
     }
 
     private void writeFile(Set<String> content, String resourceName) throws IOException {
-        FileObject file = filer.createResource(StandardLocation.CLASS_OUTPUT, "", resourceName);
+        FileObject file = readOldFile(content, resourceName);
+        if (file != null) {
+            try {
+                writeFile(content, resourceName, file);
+                return;
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
+        }
+        writeFile(content, resourceName, null);
+    }
+    private void writeFile(Set<String> content, String resourceName, FileObject overrideFile) throws IOException {
+        FileObject file = overrideFile;
+        if (file == null) {
+            file = filer.createResource(StandardLocation.CLASS_OUTPUT, "", resourceName);
+        }
         try (Writer writer = file.openWriter()) {
-            content.forEach(line -> {
-                try {
-                    writer.write(line + System.lineSeparator());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+            for (String serviceClassName : content) {
+                writer.write(serviceClassName);
+                writer.write(System.lineSeparator());
+            }
+        }
+    }
+    private FileObject readOldFile(Set<String> content, String resourceName) throws IOException {
+        Reader reader = null;
+        try {
+            final FileObject resource = filer.getResource(StandardLocation.CLASS_OUTPUT, "", resourceName);
+            reader = resource.openReader(true);
+            readOldFile(content, reader);
+            return resource;
+        } catch (FileNotFoundException e) {
+            // close reader, return null
+        } finally {
+            if (reader != null) {
+                reader.close();
+            }
+        }
+        return null;
+    }
+    private static void readOldFile(Set<String> content, Reader reader) throws IOException {
+        try (BufferedReader bufferedReader = new BufferedReader(reader)) {
+            String line = bufferedReader.readLine();
+            while (line != null) {
+                content.add(line);
+                line = bufferedReader.readLine();
+            }
         }
     }
 }
