@@ -86,7 +86,7 @@
             <dependency>
                 <groupId>com.kumuluz.ee.security</groupId>
                 <artifactId>kumuluzee-security-common</artifactId>
-                <version>${project.version}}</version>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
