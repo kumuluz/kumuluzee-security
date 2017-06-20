@@ -81,30 +81,28 @@ public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurat
 
         Keycloak keycloakAnnotation = (Keycloak) targetClass.getAnnotation(Keycloak.class);
 
-        String jsonString = "";
+        String jsonString;
         JSONObject json;
         String authServerUrl = "";
         String sslRequired = "";
 
-        if (keycloakAnnotation != null) {
+        jsonString = configurationUtil.get("kumuluzee.security.keycloak.json").orElse("{}");
+        json = toJSONObject(jsonString);
+
+        if (jsonString.isEmpty() && keycloakAnnotation != null) {
             jsonString = keycloakAnnotation.json();
+            json = toJSONObject(jsonString);
+
             authServerUrl = keycloakAnnotation.authServerUrl();
             sslRequired = keycloakAnnotation.sslRequired();
-        }
 
-        if (jsonString.isEmpty()) {
-            jsonString = configurationUtil.get("kumuluzee.security.keycloak.json").orElse("{}");
-            json = toJSONObject(jsonString);
-        } else {
-            json = toJSONObject(jsonString);
-        }
+            if (!authServerUrl.isEmpty()) {
+                json.put("auth-server-url", authServerUrl);
+            }
 
-        if (!authServerUrl.isEmpty()) {
-            json.put("auth-server-url", authServerUrl);
-        }
-
-        if (!sslRequired.isEmpty()) {
-            json.put("ssl-required", sslRequired);
+            if (!sslRequired.isEmpty()) {
+                json.put("ssl-required", sslRequired);
+            }
         }
 
         return json.toString();
