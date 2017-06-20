@@ -42,9 +42,8 @@
 
         <dependency>
             <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-jetty92-adapter-dist</artifactId>
+            <artifactId>keycloak-jetty94-adapter</artifactId>
             <version>${keycloak.version}</version>
-            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
