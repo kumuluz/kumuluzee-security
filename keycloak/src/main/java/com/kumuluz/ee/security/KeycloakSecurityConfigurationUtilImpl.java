@@ -83,8 +83,8 @@ public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurat
 
         String jsonString;
         JSONObject json;
-        String authServerUrl = "";
-        String sslRequired = "";
+        String authServerUrl;
+        String sslRequired;
 
         jsonString = configurationUtil.get("kumuluzee.security.keycloak.json").orElse("{}");
         json = toJSONObject(jsonString);
