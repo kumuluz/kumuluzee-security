@@ -33,6 +33,9 @@ import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.Response;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * @author Benjamin Kastelic
@@ -42,6 +45,9 @@ public class KeycloakSecurityProcessorUtilImpl implements SecurityProcessorUtil 
 
     @Inject
     private HttpServletRequest httpServletRequest;
+
+    @Inject
+    private KeycloakSecurityConfigurationUtilImpl keycloakSecurityConfigurationUtil;
 
     @Override
     public void processAuthentication() {
@@ -70,7 +76,18 @@ public class KeycloakSecurityProcessorUtilImpl implements SecurityProcessorUtil 
         AccessToken accessToken = keycloakSecurityContext.getToken();
         AccessToken.Access access = accessToken.getRealmAccess();
 
-        boolean isAllowed = rolesAllowed.stream().anyMatch(access::isUserInRole);
+        Map<String, String> roleMappings = keycloakSecurityConfigurationUtil.getRoleMappings();
+        Stream<String> rolesStream;
+        if (roleMappings != null) {
+            rolesStream = access.getRoles()
+                    .stream()
+                    .map(r -> roleMappings.getOrDefault(r, null))
+                    .filter(Objects::nonNull);
+        } else {
+            rolesStream = access.getRoles().stream();
+        }
+
+        boolean isAllowed = rolesStream.anyMatch(rolesAllowed::contains);
         if (!isAllowed)
             throw new ForbiddenException(Response.status(Response.Status.FORBIDDEN).build());
     }

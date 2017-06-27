@@ -23,11 +23,16 @@ package com.kumuluz.ee.security.utils;
 import com.kumuluz.ee.security.models.SecurityConstraint;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Benjamin Kastelic
  */
 public interface SecurityConfigurationUtil {
 
-    void configureSecurity(Class targetClass, Object context, List<String> declaredRoles, List<SecurityConstraint> constraints);
+    Map<String, String> getRoleMappings();
+
+    void setRoleMappings(Map<String, String> roleMappings);
+
+    void configureSecurity(Class targetClass, Object context, List<String> declaredRoles, List<SecurityConstraint> constraints, Map<String, String> roleMappings);
 }

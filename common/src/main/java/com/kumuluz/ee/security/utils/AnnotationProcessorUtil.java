@@ -20,6 +20,7 @@
  */
 package com.kumuluz.ee.security.utils;
 
+import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.security.models.SecurityConstraint;
 
 import javax.annotation.security.DeclareRoles;
@@ -58,6 +59,8 @@ public class AnnotationProcessorUtil {
     public void init(@Observes @Initialized(ApplicationScoped.class) Object context) {
         List<Application> applications = new ArrayList<>();
         ServiceLoader.load(Application.class).forEach(applications::add);
+
+        Map<String, String> roleMappings = getRoleMappings();
         for (Application application : applications) {
             List<String> declaredRoles = getDeclaredRoles(application.getClass());
             List<SecurityConstraint> constraints = getConstraints(application.getClass());
@@ -66,7 +69,7 @@ public class AnnotationProcessorUtil {
             if (targetClassIsProxied(targetClass)) {
                 targetClass = targetClass.getSuperclass();
             }
-            securityConfigurationUtil.configureSecurity(targetClass, context, declaredRoles, constraints);
+            securityConfigurationUtil.configureSecurity(targetClass, context, declaredRoles, constraints, roleMappings);
         }
     }
 
@@ -196,6 +199,12 @@ public class AnnotationProcessorUtil {
         }
 
         return constraints;
+    }
+
+    public Map<String, String> getRoleMappings() {
+        ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
+//        Map<String, String> roleMapping = configurationUtil.get("keycloak.security.roles"); // TODO
+        return new HashMap<>();
     }
 
     private String replaceParameters(String path) {

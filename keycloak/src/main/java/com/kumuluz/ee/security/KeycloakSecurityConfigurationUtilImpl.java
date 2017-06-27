@@ -33,10 +33,7 @@ import org.json.JSONObject;
 import org.keycloak.adapters.jetty.KeycloakJettyAuthenticator;
 
 import javax.enterprise.context.ApplicationScoped;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Benjamin Kastelic
@@ -44,8 +41,18 @@ import java.util.Set;
 @ApplicationScoped
 public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurationUtil {
 
+    private Map<String, String> roleMappings;
+
+    public Map<String, String> getRoleMappings() {
+        return roleMappings;
+    }
+
+    public void setRoleMappings(Map<String, String> roleMappings) {
+        this.roleMappings = roleMappings;
+    }
+
     @Override
-    public void configureSecurity(Class targetClass, Object context, List<String> declaredRoles, List<SecurityConstraint> constraints) {
+    public void configureSecurity(Class targetClass, Object context, List<String> declaredRoles, List<SecurityConstraint> constraints, Map<String, String> roleMappings) {
         String keycloakConfig = getKeycloakConfig(targetClass);
 
         WebAppContext.Context webAppContext = null;
