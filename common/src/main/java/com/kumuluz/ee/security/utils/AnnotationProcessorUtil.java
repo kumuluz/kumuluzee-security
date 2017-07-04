@@ -202,9 +202,14 @@ public class AnnotationProcessorUtil {
     }
 
     public Map<String, String> getRoleMappings() {
+        Map<String, String> roleMappings = new HashMap<>();
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
-//        Map<String, String> roleMapping = configurationUtil.get("keycloak.security.roles"); // TODO
-        return new HashMap<>();
+        Optional<List<String>> optionalMapKeys = configurationUtil.getMapKeys("kumuluzee.security.roles");
+        optionalMapKeys.ifPresent(mapKeys -> mapKeys.forEach(mapKey -> {
+            Optional<String> optionalMapValue = configurationUtil.get("kumuluzee.security.roles." + mapKey);
+            optionalMapValue.ifPresent(mapValue -> roleMappings.put(mapKey, mapValue));
+        }));
+        return roleMappings;
     }
 
     private String replaceParameters(String path) {

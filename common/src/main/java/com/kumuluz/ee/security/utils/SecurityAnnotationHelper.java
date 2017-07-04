@@ -40,12 +40,12 @@ public class SecurityAnnotationHelper {
             return method.getAnnotation(RolesAllowed.class);
         if (method.getAnnotation(PermitAll.class) != null) // method level @PermitAll annotation
             return method.getAnnotation(PermitAll.class);
-        if (method.getAnnotation(DenyAll.class) != null) // class level @DenyAll annotation
-            return method.getAnnotation(DenyAll.class);
-        if (method.getAnnotation(RolesAllowed.class) != null) // class level @RolesAllowed annotation
-            return method.getAnnotation(RolesAllowed.class);
-        if (method.getAnnotation(PermitAll.class) != null) // class level @PermitAll annotation
-            return method.getAnnotation(PermitAll.class);
+        if (method.getDeclaringClass().getAnnotation(DenyAll.class) != null) // class level @DenyAll annotation
+            return method.getDeclaringClass().getAnnotation(DenyAll.class);
+        if (method.getDeclaringClass().getAnnotation(RolesAllowed.class) != null) // class level @RolesAllowed annotation
+            return method.getDeclaringClass().getAnnotation(RolesAllowed.class);
+        if (method.getDeclaringClass().getAnnotation(PermitAll.class) != null) // class level @PermitAll annotation
+            return method.getDeclaringClass().getAnnotation(PermitAll.class);
 
         return null; // no security annotation present
     }

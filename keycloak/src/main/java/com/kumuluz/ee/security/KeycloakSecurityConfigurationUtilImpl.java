@@ -81,6 +81,8 @@ public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurat
         if (webAppContext != null) {
             webAppContext.setInitParameter("org.keycloak.json.adapterConfig", keycloakConfig);
         }
+
+        this.roleMappings = roleMappings;
     }
 
     private String getKeycloakConfig(Class targetClass) {
