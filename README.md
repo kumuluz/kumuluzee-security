@@ -25,8 +25,8 @@ To protect a REST service using KumuluzEE Security authentication you have to an
 the `@DeclareRoles` annotation. When using the `@DeclareRoles` annotation the Keycloak configuration (**keycloak.json**) 
 has to be provided with configuration key `kumuluzee.security.keycloak.json`. The configuration key can be defined as 
 an environment variable, file property or config server entry (if using the KumuluzEE Config extension with support for 
-etcd/Consul). Please refer to KumuluzEE Config for more information. Optionally you can override the configuration in 
-the code using the `@Keycloak` annotation. 
+etcd/Consul). Please refer to KumuluzEE Config for more information. Optionally you can also provide the configuration 
+in code using the `@Keycloak` annotation. 
 
 Example of security configuration with configuration override:
 ```java
@@ -70,7 +70,7 @@ public class CustomerResource {
 }
 ```
 
-**NOTE**: When using the non CDI security constraint annotations note that these constraints behave as if they were 
+**NOTE**: When using the non CDI security constraint annotations, note that these constraints behave as if they were 
 declared in the **web.xml** descriptor, i.e. the url patterns do not support path parameters.
 
 The security extension also supports CDI based security, which means that security constraints are checked and resolved 
@@ -95,6 +95,19 @@ public class CustomerResource {
     }
 }
 ``` 
+
+When using the CDI based security it is also possible to provide application role mappings. The specified role mappings 
+transform Keycloak roles into internal application roles. Role mappings are defined using the `kumuluzee.security.roles`
+key.
+
+Example role mapping configuration:
+```yaml
+kumuluzee:
+  security:
+    roles:
+      user: role_user
+      admin: role_admin
+```
 
 ## Changelog
 
