@@ -78,7 +78,7 @@ public class KeycloakSecurityProcessorUtilImpl implements SecurityProcessorUtil 
 
         Map<String, String> roleMappings = keycloakSecurityConfigurationUtil.getRoleMappings();
         Stream<String> rolesStream;
-        if (roleMappings != null) {
+        if (roleMappings != null && !roleMappings.isEmpty()) {
             rolesStream = access.getRoles()
                     .stream()
                     .map(r -> roleMappings.getOrDefault(r, null))
