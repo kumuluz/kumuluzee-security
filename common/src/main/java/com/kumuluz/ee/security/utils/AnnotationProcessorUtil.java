@@ -97,8 +97,15 @@ public class AnnotationProcessorUtil {
         ApplicationPath applicationPathAnnotation = applicationClass.getAnnotation(ApplicationPath.class);
         if (applicationPathAnnotation != null) {
             applicationPath = applicationPathAnnotation.value();
-            if (!applicationPath.isEmpty() && !applicationPath.startsWith("/")) {
-                applicationPath = "/" + applicationPath;
+            if (applicationPath.isEmpty()) {
+                applicationPath = "/";
+            } else {
+                if (!applicationPath.startsWith("/")) {
+                    applicationPath = "/" + applicationPath;
+                }
+                if (applicationPath.endsWith("/") && applicationPath.length() > 1) {
+                    applicationPath = applicationPath.substring(0, applicationPath.length() - 1);
+                }
             }
         }
 
@@ -112,13 +119,15 @@ public class AnnotationProcessorUtil {
             Path resourcePathAnnotation = resourceClass.getAnnotation(Path.class);
             if (resourcePathAnnotation != null) {
                 resourcePath = resourcePathAnnotation.value();
-                if (!resourcePath.isEmpty() && !resourcePath.startsWith("/")) {
-                    resourcePath = applicationPath + "/" + resourcePath;
-                } else if (!resourcePath.isEmpty() && resourcePath.startsWith("/")) {
-                    resourcePath = applicationPath + resourcePath;
-                } else {
-                    resourcePath = applicationPath;
+                if (!resourcePath.isEmpty()) {
+                    if (!resourcePath.startsWith("/")) {
+                        resourcePath = "/" + resourcePath;
+                    }
+                    if (resourcePath.endsWith("/") && resourcePath.length() > 1) {
+                        resourcePath = resourcePath.substring(0, resourcePath.length() - 1);
+                    }
                 }
+                resourcePath = applicationPath + resourcePath;
             }
 
             boolean resourceDenyAll = resourceClass.getAnnotation(DenyAll.class) != null;
@@ -142,16 +151,14 @@ public class AnnotationProcessorUtil {
                         Path methodPathAnnotation = (Path) methodAnnotation;
                         methodPath = methodPathAnnotation.value();
                         if (!methodPath.isEmpty()) {
-                            if (methodPath.startsWith("/")) {
-                                methodPath = resourcePath + methodPath;
-                            } else if (!methodPath.startsWith("/")) {
-                                methodPath = resourcePath + "/" + methodPath;
-                            } else {
-                                methodPath = resourcePath;
+                            if (!methodPath.startsWith("/")) {
+                                methodPath = "/" + methodPath;
                             }
-                        } else {
-                            methodPath = resourcePath;
+                            if (methodPath.endsWith("/") && methodPath.length() > 1) {
+                                methodPath = methodPath.substring(0, methodPath.length() - 1);
+                            }
                         }
+                        methodPath = resourcePath + methodPath;
                         methodPath = replaceParameters(methodPath);
                     } else if (methodAnnotation instanceof DenyAll) {
                         hasMethodSecurityAnnotations = true;
