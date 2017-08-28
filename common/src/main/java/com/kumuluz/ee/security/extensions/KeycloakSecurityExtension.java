@@ -32,7 +32,7 @@ import java.util.logging.Logger;
  *
  * @author Benjamin Kastelic
  */
-@EeExtensionDef(name = "keycloak", type = EeExtensionType.SECURITY)
+@EeExtensionDef(name = "keycloak", group = EeExtensionGroup.SECURITY)
 @EeComponentDependencies({
         @EeComponentDependency(EeComponentType.SERVLET),
         @EeComponentDependency(EeComponentType.CDI)
