@@ -33,10 +33,8 @@ import java.util.logging.Logger;
  * @author Benjamin Kastelic
  */
 @EeExtensionDef(name = "keycloak", group = EeExtensionGroup.SECURITY)
-@EeComponentDependencies({
-        @EeComponentDependency(EeComponentType.SERVLET),
-        @EeComponentDependency(EeComponentType.CDI)
-})
+@EeComponentDependency(EeComponentType.SERVLET)
+@EeComponentDependency(EeComponentType.CDI)
 public class KeycloakSecurityExtension implements Extension {
 
     private static final Logger log = Logger.getLogger(KeycloakSecurityExtension.class.getName());
