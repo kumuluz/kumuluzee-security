@@ -20,6 +20,8 @@
  */
 package com.kumuluz.ee.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.security.annotations.Keycloak;
 import com.kumuluz.ee.security.models.SecurityConstraint;
@@ -28,11 +30,10 @@ import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.keycloak.adapters.jetty.KeycloakJettyAuthenticator;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -86,12 +87,14 @@ public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurat
     }
 
     private String getKeycloakConfig(Class targetClass) {
+        ObjectMapper mapper = new ObjectMapper();
+
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
 
         Keycloak keycloakAnnotation = (Keycloak) targetClass.getAnnotation(Keycloak.class);
 
         String jsonString;
-        JSONObject json;
+        ObjectNode json;
         String authServerUrl;
         String sslRequired;
 
@@ -117,12 +120,14 @@ public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurat
         return json.toString();
     }
 
-    private JSONObject toJSONObject(String jsonString) {
-        JSONObject json;
+    private ObjectNode toJSONObject(String jsonString) {
+        ObjectMapper mapper = new ObjectMapper();
+
+        ObjectNode json;
         try {
-            json = new JSONObject(jsonString);
-        } catch (JSONException e) {
-            json = new JSONObject();
+            json = mapper.readValue(jsonString, ObjectNode.class);
+        } catch (IOException e) {
+            json = mapper.createObjectNode();
         }
         return json;
     }
