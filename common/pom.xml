@@ -7,7 +7,7 @@
     <parent>
         <artifactId>kumuluzee-security</artifactId>
         <groupId>com.kumuluz.ee.security</groupId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
 
     <name>KumuluzEE Security Commons</name>
