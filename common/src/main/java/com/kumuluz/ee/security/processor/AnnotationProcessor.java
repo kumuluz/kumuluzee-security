@@ -42,7 +42,8 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 
 /**
- * Compile-time annotation processor for DeclareRoles, RolesAllowed, PermitAll and DenyAll annotations. Generates service file.
+ * Compile-time annotation processor for DeclareRoles, RolesAllowed, PermitAll and DenyAll annotations. Generates
+ * service file.
  *
  * @author Benjamin Kastelic
  */
@@ -51,12 +52,6 @@ public class AnnotationProcessor extends AbstractProcessor {
     private Filer filer;
 
     private List<Class<? extends Annotation>> securityProviders = Arrays.asList(Keycloak.class);
-
-    // classes with @DeclareRoles annotation
-    private Set<String> roleElementNames = new HashSet<>();
-
-    // classes with @RolesAllowed, @PermitAll and @DenyAll annotations
-    private Set<String> constraintElementNames = new HashSet<>();
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -76,7 +71,14 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnvironment) {
+
         Set<? extends Element> elements;
+
+        // classes with @DeclareRoles annotation
+        Set<String> roleElementNames = new HashSet<>();
+
+        // classes with @RolesAllowed, @PermitAll and @DenyAll annotations
+        Set<String> constraintElementNames = new HashSet<>();
 
         for (Class<? extends Annotation> securityProvider : securityProviders) {
             elements = roundEnvironment.getElementsAnnotatedWith(securityProvider);
@@ -96,13 +98,17 @@ public class AnnotationProcessor extends AbstractProcessor {
         elements.forEach(element -> extractElementName(constraintElementNames, element));
 
         try {
-            writeFile(roleElementNames, "META-INF/services/javax.ws.rs.core.Application");
-            writeFile(constraintElementNames, "META-INF/resources/java.lang.Object");
+            if (!roleElementNames.isEmpty()) {
+                writeFile(roleElementNames, "META-INF/services/javax.ws.rs.core.Application");
+            }
+            if (!constraintElementNames.isEmpty()) {
+                writeFile(constraintElementNames, "META-INF/resources/java.lang.Object");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return true;
+        return false;
     }
 
     private void extractElementName(Set<String> elementNames, Element element) {
@@ -131,6 +137,7 @@ public class AnnotationProcessor extends AbstractProcessor {
         }
         writeFile(content, resourceName, null);
     }
+
     private void writeFile(Set<String> content, String resourceName, FileObject overrideFile) throws IOException {
         FileObject file = overrideFile;
         if (file == null) {
@@ -143,6 +150,7 @@ public class AnnotationProcessor extends AbstractProcessor {
             }
         }
     }
+
     private FileObject readOldFile(Set<String> content, String resourceName) throws IOException {
         Reader reader = null;
         try {
@@ -159,6 +167,7 @@ public class AnnotationProcessor extends AbstractProcessor {
         }
         return null;
     }
+
     private static void readOldFile(Set<String> content, Reader reader) throws IOException {
         try (BufferedReader bufferedReader = new BufferedReader(reader)) {
             String line = bufferedReader.readLine();
