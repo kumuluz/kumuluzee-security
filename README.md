@@ -53,6 +53,7 @@ It is possible to specify security constraints for JAX-RS resources using the st
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Path("customers")
+@Secure
 public class CustomerResource {
 
     @GET
