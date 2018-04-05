@@ -70,11 +70,12 @@ public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurat
         if (webAppContextHandler != null) {
             ConstraintSecurityHandler constraintSecurityHandler = new ConstraintSecurityHandler();
             constraintSecurityHandler.setAuthenticator(new KeycloakJettyAuthenticator());
-
-            Set<String> roles = new HashSet<>(declaredRoles);
+            
+            // handle this in CDI security, not with Jetty
+            /*Set<String> roles = new HashSet<>(declaredRoles);
             constraintSecurityHandler.setRoles(roles);
             List<ConstraintMapping> constraintMappings = toConstraintMappings(constraints);
-            constraintSecurityHandler.setConstraintMappings(constraintMappings);
+            constraintSecurityHandler.setConstraintMappings(constraintMappings);*/
 
             webAppContextHandler.setSecurityHandler(constraintSecurityHandler);
         }
