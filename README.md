@@ -3,7 +3,7 @@
 
 > KumuluzEE Security extension for the Kumuluz EE microservice framework. 
 
-KumuluzEE Security is a security extension for the KumuluzEE microservice framework. It provides support for OpenID 
+KumuluzEE Security is a security project for the KumuluzEE microservice framework. It provides support for OpenID 
 authentication through standard Java EE security annotations for roles. It is specifically targeted towards securing 
 REST services. Roles are mapped to the selected OpenID provider. KumuluzEE Security has been designed to work with 
 different OpenID providers. Currently only Keycloak is supported. Contributions for other OpenID providers are welcome.
@@ -24,7 +24,7 @@ You can enable the KumuluzEE Security authentication with Keycloak by adding the
 To protect a REST service using KumuluzEE Security authentication you have to annotate the REST application class with 
 the `@DeclareRoles` annotation. When using the `@DeclareRoles` annotation the Keycloak configuration (**keycloak.json**) 
 has to be provided with configuration key `kumuluzee.security.keycloak.json`. The configuration key can be defined as 
-an environment variable, file property or config server entry (if using the KumuluzEE Config extension with support for 
+an environment variable, file property or config server entry (if using the KumuluzEE Config project with support for 
 etcd/Consul). Please refer to KumuluzEE Config for more information. Optionally you can also provide the configuration 
 in code using the `@Keycloak` annotation. 
 
