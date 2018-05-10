@@ -37,6 +37,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
+import javax.ws.rs.ApplicationPath;
 import java.io.*;
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -114,9 +115,9 @@ public class AnnotationProcessor extends AbstractProcessor {
     private void extractElementName(Set<String> elementNames, Element element) {
         ElementKind elementKind = element.getKind();
 
-        if (elementKind.equals(ElementKind.CLASS) && !isCdiSecurityEnabled(element)) {
+        if (elementKind.equals(ElementKind.CLASS) && !isCdiSecurityEnabled(element) && element.getAnnotation(ApplicationPath.class) != null) {
             elementNames.add(element.toString());
-        } else if (elementKind.equals(ElementKind.METHOD) && !isCdiSecurityEnabled(element.getEnclosingElement())) {
+        } else if (elementKind.equals(ElementKind.METHOD) && !isCdiSecurityEnabled(element.getEnclosingElement()) && element.getEnclosingElement().getAnnotation(ApplicationPath.class) != null) {
             elementNames.add(element.getEnclosingElement().toString());
         }
     }
