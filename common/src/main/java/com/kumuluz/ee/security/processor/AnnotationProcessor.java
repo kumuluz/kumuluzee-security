@@ -117,7 +117,7 @@ public class AnnotationProcessor extends AbstractProcessor {
 
         if (elementKind.equals(ElementKind.CLASS) && !isCdiSecurityEnabled(element) && element.getAnnotation(ApplicationPath.class) != null) {
             elementNames.add(element.toString());
-        } else if (elementKind.equals(ElementKind.METHOD) && !isCdiSecurityEnabled(element.getEnclosingElement()) && element.getEnclosingElement().getAnnotation(ApplicationPath.class) != null) {
+        } else if (elementKind.equals(ElementKind.METHOD) && !isCdiSecurityEnabled(element.getEnclosingElement())) {
             elementNames.add(element.getEnclosingElement().toString());
         }
     }
