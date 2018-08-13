@@ -57,7 +57,6 @@ public class AnnotationProcessorUtil {
     public void init(@Observes @Initialized(ApplicationScoped.class) Object context) {
         List<Application> applications = new ArrayList<>();
         ServiceLoader.load(Application.class).forEach(applications::add);
-
         Map<String, String> roleMappings = getRoleMappings();
         for (Application application : applications) {
             List<String> declaredRoles = getDeclaredRoles(application.getClass());
@@ -69,6 +68,45 @@ public class AnnotationProcessorUtil {
             }
             securityConfigurationUtil.configureSecurity(targetClass, context, declaredRoles, constraints, roleMappings);
         }
+
+        List<Class<?>> graphQLClasses = getGraphQLClasses();
+        if(graphQLClasses.size() == 1) {
+            Class graphqlClass = graphQLClasses.get(0);
+            List<String> declaredRoles = getDeclaredRoles(graphqlClass);
+            if (declaredRoles.size() > 0) {
+                List<SecurityConstraint> constraints = getConstraints(graphqlClass);
+                Class targetClass = graphqlClass;
+                if (targetClassIsProxied(targetClass)) {
+                    targetClass = targetClass.getSuperclass();
+                }
+                securityConfigurationUtil.configureSecurity(targetClass, context, declaredRoles, constraints, roleMappings);
+            }
+        } else if(graphQLClasses.size() > 1) {
+            log.warning("Found multiple declaratinos of GraphQLApplication. Please only provide one.");
+        }
+    }
+
+    private List<Class<?>> getGraphQLClasses() {
+        List<Class<?>> resourceClasses = new ArrayList<>();
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream is = classLoader.getResourceAsStream("META-INF/services/com.kumuluz.ee.graphql.GraphQLApplication");
+
+        if (is != null) {
+            Scanner scanner = new Scanner(is);
+            while (scanner.hasNextLine()) {
+                String className = scanner.nextLine();
+                try {
+                    Class resourceClass = Class.forName(className);
+                    resourceClasses.add(resourceClass);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+            scanner.close();
+        }
+
+        return resourceClasses;
     }
 
     private List<String> getDeclaredRoles(Class<?> applicationClass) {
