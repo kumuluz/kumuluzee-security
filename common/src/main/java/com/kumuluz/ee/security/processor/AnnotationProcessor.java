@@ -84,19 +84,11 @@ public class AnnotationProcessor extends AbstractProcessor {
 
         for (Class<? extends Annotation> securityProvider : securityProviders) {
             elements = roundEnvironment.getElementsAnnotatedWith(securityProvider);
-            elements.forEach(element -> {
-                if(extendsJAXRSApplicationClass(element)) {
-                    extractElementName(roleElementNames, element);
-                }
-            });
+            elements.stream().filter(this::extendsJAXRSApplicationClass).forEach(element -> extractElementName(roleElementNames, element));
         }
 
         elements = roundEnvironment.getElementsAnnotatedWith(DeclareRoles.class);
-        elements.forEach(element -> {
-            if(extendsJAXRSApplicationClass(element)) {
-                extractElementName(roleElementNames, element);
-            }
-        });
+        elements.stream().filter(this::extendsJAXRSApplicationClass).forEach(element -> extractElementName(roleElementNames, element));
 
         elements = roundEnvironment.getElementsAnnotatedWith(RolesAllowed.class);
         elements.forEach(element -> extractElementName(constraintElementNames, element));
