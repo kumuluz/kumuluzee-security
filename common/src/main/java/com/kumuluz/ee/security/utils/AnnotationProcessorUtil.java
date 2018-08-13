@@ -69,19 +69,19 @@ public class AnnotationProcessorUtil {
             securityConfigurationUtil.configureSecurity(targetClass, context, declaredRoles, constraints, roleMappings);
         }
 
-        List<Class<?>> classList = getGraphQLClasses();
-        if(classList.size() == 1) {
-            Class c = classList.get(0);
-            List<String> declaredRoles = getDeclaredRoles(c);
+        List<Class<?>> graphQLClasses = getGraphQLClasses();
+        if(graphQLClasses.size() == 1) {
+            Class graphqlClass = graphQLClasses.get(0);
+            List<String> declaredRoles = getDeclaredRoles(graphqlClass);
             if (declaredRoles.size() > 0) {
-                List<SecurityConstraint> constraints = getConstraints(c);
-                Class targetClass = c;
+                List<SecurityConstraint> constraints = getConstraints(graphqlClass);
+                Class targetClass = graphqlClass;
                 if (targetClassIsProxied(targetClass)) {
                     targetClass = targetClass.getSuperclass();
                 }
                 securityConfigurationUtil.configureSecurity(targetClass, context, declaredRoles, constraints, roleMappings);
             }
-        } else if(classList.size() > 1) {
+        } else if(graphQLClasses.size() > 1) {
             log.warning("Found multiple declaratinos of GraphQLApplication. Please only provide one.");
         }
     }

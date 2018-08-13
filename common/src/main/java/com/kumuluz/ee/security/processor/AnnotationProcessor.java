@@ -35,9 +35,10 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
-import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
 import java.io.*;
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -83,11 +84,19 @@ public class AnnotationProcessor extends AbstractProcessor {
 
         for (Class<? extends Annotation> securityProvider : securityProviders) {
             elements = roundEnvironment.getElementsAnnotatedWith(securityProvider);
-            elements.forEach(element -> extractElementName(roleElementNames, element));
+            elements.forEach(element -> {
+                if(extendsJAXRSApplicationClass(element)) {
+                    extractElementName(roleElementNames, element);
+                }
+            });
         }
 
         elements = roundEnvironment.getElementsAnnotatedWith(DeclareRoles.class);
-        elements.forEach(element -> extractElementName(roleElementNames, element));
+        elements.forEach(element -> {
+            if(extendsJAXRSApplicationClass(element)) {
+                extractElementName(roleElementNames, element);
+            }
+        });
 
         elements = roundEnvironment.getElementsAnnotatedWith(RolesAllowed.class);
         elements.forEach(element -> extractElementName(constraintElementNames, element));
@@ -112,10 +121,15 @@ public class AnnotationProcessor extends AbstractProcessor {
         return false;
     }
 
+    private boolean extendsJAXRSApplicationClass(Element element) {
+        TypeMirror applicationClass = processingEnv.getElementUtils().getTypeElement(Application.class.getCanonicalName()).asType();
+        return processingEnv.getTypeUtils().isAssignable(element.asType(), applicationClass);
+    }
+
     private void extractElementName(Set<String> elementNames, Element element) {
         ElementKind elementKind = element.getKind();
 
-        if (elementKind.equals(ElementKind.CLASS) && !isCdiSecurityEnabled(element) && element.getAnnotation(ApplicationPath.class) != null) {
+        if (elementKind.equals(ElementKind.CLASS) && !isCdiSecurityEnabled(element)) {
             elementNames.add(element.toString());
         } else if (elementKind.equals(ElementKind.METHOD) && !isCdiSecurityEnabled(element.getEnclosingElement())) {
             elementNames.add(element.getEnclosingElement().toString());
