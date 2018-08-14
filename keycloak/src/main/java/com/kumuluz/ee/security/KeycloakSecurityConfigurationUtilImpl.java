@@ -71,10 +71,14 @@ public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurat
             ConstraintSecurityHandler constraintSecurityHandler = new ConstraintSecurityHandler();
             constraintSecurityHandler.setAuthenticator(new KeycloakJettyAuthenticator());
 
-            Set<String> roles = new HashSet<>(declaredRoles);
-            constraintSecurityHandler.setRoles(roles);
-            List<ConstraintMapping> constraintMappings = toConstraintMappings(constraints);
-            constraintSecurityHandler.setConstraintMappings(constraintMappings);
+            // Allows to disable security in jetty servlet
+            boolean jettyAuthDisabled = ConfigurationUtil.getInstance().getBoolean("kumuluzee.security.disable-jetty-auth").orElse(false);
+            if (!jettyAuthDisabled) {
+                Set<String> roles = new HashSet<>(declaredRoles);
+                constraintSecurityHandler.setRoles(roles);
+                List<ConstraintMapping> constraintMappings = toConstraintMappings(constraints);
+                constraintSecurityHandler.setConstraintMappings(constraintMappings);
+            }
 
             webAppContextHandler.setSecurityHandler(constraintSecurityHandler);
         }

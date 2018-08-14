@@ -110,6 +110,8 @@ kumuluzee:
       admin: role_admin
 ```
 
+You may also disable Jetty servlet security, which is enabled by default, by setting key `kumuluzee.security.disable-jetty-auth` to `true`.
+
 ## Changelog
 
 Recent changes can be viewed on Github on the [Releases Page](https://github.com/kumuluz/kumuluzee-security/releases)
