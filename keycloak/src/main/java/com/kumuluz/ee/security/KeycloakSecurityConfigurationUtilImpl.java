@@ -71,7 +71,7 @@ public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurat
             ConstraintSecurityHandler constraintSecurityHandler = new ConstraintSecurityHandler();
             constraintSecurityHandler.setAuthenticator(new KeycloakJettyAuthenticator());
 
-            // When using CDI security, Jetty security must be disabled, otherwise it causes problems
+            // Allows to disable security in jetty servlet
             boolean jettyAuthDisabled = ConfigurationUtil.getInstance().getBoolean("kumuluzee.security.disable-jetty-auth").orElse(false);
             if (!jettyAuthDisabled) {
                 Set<String> roles = new HashSet<>(declaredRoles);
