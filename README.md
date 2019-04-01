@@ -10,14 +10,22 @@ different OpenID providers. Currently only Keycloak is supported. Contributions 
 
 ## Usage
 
-You can enable the KumuluzEE Security authentication with Keycloak by adding the following dependency:
+You can enable the KumuluzEE Security authentication with Keycloak by adding the following dependencies:
+
 ```xml
 <dependency>
     <groupId>com.kumuluz.ee.security</groupId>
     <artifactId>kumuluzee-security-keycloak</artifactId>
     <version>${kumuluzee-security.version}</version>
 </dependency>
+<dependency>
+    <groupId>org.keycloak</groupId>
+    <artifactId>keycloak-jetty94-adapter</artifactId>
+    <version>${keycloak.version}</version>
+</dependency>
 ```
+
+The `keycloak.version` property should match the version of keycloak that is used.
 
 ### Security configuration
 
