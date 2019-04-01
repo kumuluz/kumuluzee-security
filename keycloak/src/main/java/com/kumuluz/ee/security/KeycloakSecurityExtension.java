@@ -18,7 +18,7 @@
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.kumuluz.ee.security.extensions;
+package com.kumuluz.ee.security;
 
 import com.kumuluz.ee.common.Extension;
 import com.kumuluz.ee.common.config.EeConfig;
@@ -33,8 +33,10 @@ import java.util.logging.Logger;
  * @author Benjamin Kastelic
  */
 @EeExtensionDef(name = "keycloak", group = EeExtensionGroup.SECURITY)
-@EeComponentDependency(EeComponentType.SERVLET)
-@EeComponentDependency(EeComponentType.CDI)
+@EeComponentDependencies({
+        @EeComponentDependency(EeComponentType.SERVLET),
+        @EeComponentDependency(EeComponentType.CDI)
+})
 public class KeycloakSecurityExtension implements Extension {
 
     private static final Logger log = Logger.getLogger(KeycloakSecurityExtension.class.getName());
@@ -42,6 +44,13 @@ public class KeycloakSecurityExtension implements Extension {
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
         log.info("Initialising security implemented by Keycloak.");
+
+        try {
+            Class.forName("org.keycloak.adapters.jetty.KeycloakJettyAuthenticator");
+        } catch (ClassNotFoundException e) {
+            log.severe("Keycloak Jetty Adapter not found, please include it as a dependency. " +
+                    "The extension may not work as expected.");
+        }
     }
 
     @Override
