@@ -41,6 +41,7 @@ import javax.tools.StandardLocation;
 import javax.ws.rs.core.Application;
 import java.io.*;
 import java.lang.annotation.Annotation;
+import java.nio.file.NoSuchFileException;
 import java.util.*;
 
 /**
@@ -114,7 +115,8 @@ public class AnnotationProcessor extends AbstractProcessor {
     }
 
     private boolean extendsJAXRSApplicationClass(Element element) {
-        TypeMirror applicationClass = processingEnv.getElementUtils().getTypeElement(Application.class.getCanonicalName()).asType();
+        TypeMirror applicationClass =
+                processingEnv.getElementUtils().getTypeElement(Application.class.getCanonicalName()).asType();
         return processingEnv.getTypeUtils().isAssignable(element.asType(), applicationClass);
     }
 
@@ -165,7 +167,7 @@ public class AnnotationProcessor extends AbstractProcessor {
             reader = resource.openReader(true);
             readOldFile(content, reader);
             return resource;
-        } catch (FileNotFoundException e) {
+        } catch (NoSuchFileException | FileNotFoundException e) {
             // close reader, return null
         } finally {
             if (reader != null) {
