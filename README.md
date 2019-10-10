@@ -120,7 +120,7 @@ kumuluzee:
 
 You may also disable Jetty servlet security, which is enabled by default, by setting key `kumuluzee.security.disable-jetty-auth` to `true`.
 
-You can set a custom config resolver class (see [here](https://www.keycloak.org/docs/latest/securing_apps/index.html#config_external_adapter)) to be able to tweak keycloak configuration at runtime for each request (for multitenant purpose). Note that this class must implements `org.keycloak.adapters.KeycloakConfigResolver`.
+You can set a custom config resolver class (see [here](https://www.keycloak.org/docs/latest/securing_apps/index.html#config_external_adapter)) to be able to tweak Keycloak configuration at runtime for each request (for multitenant or purposes). Note that this class must implement `org.keycloak.adapters.KeycloakConfigResolver`.
 
 Example custom config resolver configuration:
 ```yaml
