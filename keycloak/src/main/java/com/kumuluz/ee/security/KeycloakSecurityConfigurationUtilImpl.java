@@ -67,12 +67,14 @@ public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurat
             webAppContextHandler = (WebAppContext) webAppContext.getContextHandler();
         }
 
+        final ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
+
         if (webAppContextHandler != null) {
             ConstraintSecurityHandler constraintSecurityHandler = new ConstraintSecurityHandler();
             constraintSecurityHandler.setAuthenticator(new KeycloakJettyAuthenticator());
 
             // Allows to disable security in jetty servlet
-            boolean jettyAuthDisabled = ConfigurationUtil.getInstance().getBoolean("kumuluzee.security.disable-jetty-auth").orElse(false);
+            boolean jettyAuthDisabled = configurationUtil.getBoolean("kumuluzee.security.disable-jetty-auth").orElse(false);
             if (!jettyAuthDisabled) {
                 Set<String> roles = new HashSet<>(declaredRoles);
                 constraintSecurityHandler.setRoles(roles);
@@ -85,6 +87,10 @@ public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurat
 
         if (webAppContext != null) {
             webAppContext.setInitParameter("org.keycloak.json.adapterConfig", keycloakConfig);
+            Optional<String> configResolver = configurationUtil.get("kumuluzee.security.keycloak.config-resolver");
+            if (configResolver.isPresent()) {
+                webAppContext.setInitParameter("keycloak.config.resolver", configResolver.get());
+            }
         }
 
         this.roleMappings = roleMappings;
