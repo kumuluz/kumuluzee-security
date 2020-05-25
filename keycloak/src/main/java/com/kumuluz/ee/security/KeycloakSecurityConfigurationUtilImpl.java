@@ -22,6 +22,7 @@ package com.kumuluz.ee.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.kumuluz.ee.common.utils.StringUtils;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.security.annotations.Keycloak;
 import com.kumuluz.ee.security.models.SecurityConstraint;
@@ -97,37 +98,64 @@ public class KeycloakSecurityConfigurationUtilImpl implements SecurityConfigurat
     }
 
     private String getKeycloakConfig(Class targetClass) {
+        return or(fromConfigPlainJson(), or(fromAnnotation(targetClass), fromConfigPartialProperties()))
+                .map(ObjectNode::toString)
+                .orElseThrow(() -> new IllegalStateException("No keycloak configuration found"));
+    }
+
+    //FIXME replace by JDK9 Optional.or method
+    @Deprecated
+    private static <T> Optional<T> or(Optional<T> first, Optional<T> second) {
+        return first.isPresent() ? first : second;
+    }
+
+    private Optional<ObjectNode> fromConfigPartialProperties() {
+        ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
         ObjectMapper mapper = new ObjectMapper();
 
+        ObjectNode json = mapper.createObjectNode();
+        configurationUtil.get("kumuluzee.security.keycloak.realm")
+                .ifPresent(realm -> json.put("realm", realm));
+        configurationUtil.get("kumuluzee.security.keycloak.auth-server-url")
+                .ifPresent(authServerUrl -> json.put("auth-server-url", authServerUrl));
+        configurationUtil.get("kumuluzee.security.keycloak.bearer-only")
+                .ifPresent(bearerOnly -> json.put("bearer-only", bearerOnly));
+        configurationUtil.get("kumuluzee.security.keycloak.ssl-required")
+                .ifPresent(sslRequired -> json.put("ssl-required", sslRequired));
+        configurationUtil.get("kumuluzee.security.keycloak.resource")
+                .ifPresent(resource -> json.put("resource", resource));
+
+        return Optional.of(json);
+    }
+
+    private Optional<ObjectNode> fromConfigPlainJson() {
         ConfigurationUtil configurationUtil = ConfigurationUtil.getInstance();
+        final String json = configurationUtil.get("kumuluzee.security.keycloak.json").orElse(null);
+        return StringUtils.isNullOrEmpty(json) ? Optional.empty() : Optional.of(toJSONObject(json));
+    }
 
-        Keycloak keycloakAnnotation = (Keycloak) targetClass.getAnnotation(Keycloak.class);
+    private Optional<ObjectNode> fromAnnotation(Class targetClass) {
+        final Keycloak keycloakAnnotation = (Keycloak) targetClass.getAnnotation(Keycloak.class);
 
-        String jsonString;
-        ObjectNode json;
-        String authServerUrl;
-        String sslRequired;
-
-        jsonString = configurationUtil.get("kumuluzee.security.keycloak.json").orElse("{}");
-        json = toJSONObject(jsonString);
-
-        if (jsonString.isEmpty() && keycloakAnnotation != null) {
-            jsonString = keycloakAnnotation.json();
-            json = toJSONObject(jsonString);
-
-            authServerUrl = keycloakAnnotation.authServerUrl();
-            sslRequired = keycloakAnnotation.sslRequired();
-
-            if (!authServerUrl.isEmpty()) {
-                json.put("auth-server-url", authServerUrl);
-            }
-
-            if (!sslRequired.isEmpty()) {
-                json.put("ssl-required", sslRequired);
-            }
+        if (keycloakAnnotation == null) {
+            return Optional.empty();
         }
 
-        return json.toString();
+        final String jsonString = keycloakAnnotation.json();
+        final ObjectNode json = toJSONObject(jsonString);
+
+        final String authServerUrl = keycloakAnnotation.authServerUrl();
+        final String sslRequired = keycloakAnnotation.sslRequired();
+
+        if (!authServerUrl.isEmpty()) {
+            json.put("auth-server-url", authServerUrl);
+        }
+
+        if (!sslRequired.isEmpty()) {
+            json.put("ssl-required", sslRequired);
+        }
+
+        return jsonString.isEmpty() ? Optional.empty() : Optional.of(json);
     }
 
     private ObjectNode toJSONObject(String jsonString) {

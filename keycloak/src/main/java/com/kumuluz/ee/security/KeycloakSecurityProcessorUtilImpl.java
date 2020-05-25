@@ -20,6 +20,7 @@
  */
 package com.kumuluz.ee.security;
 
+import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.security.utils.SecurityProcessorUtil;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
@@ -32,9 +33,15 @@ import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.Response;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -74,17 +81,27 @@ public class KeycloakSecurityProcessorUtilImpl implements SecurityProcessorUtil 
         KeycloakPrincipal<?> keycloakPrincipal = (KeycloakPrincipal<?>) principal;
         KeycloakSecurityContext keycloakSecurityContext = keycloakPrincipal.getKeycloakSecurityContext();
         AccessToken accessToken = keycloakSecurityContext.getToken();
-        AccessToken.Access access = accessToken.getRealmAccess();
+
+        // Extract roles either from specified resources or realm if nothing specified
+        final Set<String> roles = getConfigList("kumuluzee.security.keycloak.roles-from-resources")
+                .map(resourceNames -> resourceNames.stream()
+                        .map(accessToken::getResourceAccess)
+                        .filter(Objects::nonNull)
+                )
+                .orElse(Stream.of(accessToken.getRealmAccess()))
+                .map(AccessToken.Access::getRoles)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
 
         Map<String, String> roleMappings = keycloakSecurityConfigurationUtil.getRoleMappings();
         Stream<String> rolesStream;
         if (roleMappings != null && !roleMappings.isEmpty()) {
-            rolesStream = access.getRoles()
+            rolesStream = roles
                     .stream()
                     .map(r -> roleMappings.getOrDefault(r, null))
                     .filter(Objects::nonNull);
         } else {
-            rolesStream = access.getRoles().stream();
+            rolesStream = roles.stream();
         }
 
         boolean isAllowed = rolesStream.anyMatch(rolesAllowed::contains);
@@ -97,5 +114,27 @@ public class KeycloakSecurityProcessorUtilImpl implements SecurityProcessorUtil 
         Principal principal = httpServletRequest.getUserPrincipal();
         if (principal == null)
             throw new NotAuthorizedException(Response.status(Response.Status.UNAUTHORIZED).build());
+    }
+
+    private static Optional<List<String>> getConfigList(String key) {
+        ConfigurationUtil cfg = ConfigurationUtil.getInstance();
+
+        Optional<Integer> listSize = cfg.getListSize(key);
+
+        if (listSize.isPresent()) {
+            List<String> list = new ArrayList<>();
+
+            for (int i = 0; i < listSize.get(); i++) {
+                Optional<String> item = cfg.get(key + "[" + i + "]");
+
+                item.ifPresent(list::add);
+            }
+
+            if (list.size() > 0) {
+                return Optional.of(Collections.unmodifiableList(list));
+            }
+        }
+
+        return Optional.empty();
     }
 }
