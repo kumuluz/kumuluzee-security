@@ -83,7 +83,7 @@ public class KeycloakSecurityProcessorUtilImpl implements SecurityProcessorUtil 
         AccessToken accessToken = keycloakSecurityContext.getToken();
 
         // Extract roles either from specified resources or realm if nothing specified
-        final Set<String> roles = getConfigList("kumuluzee.security.keycloak.roles-from-resources")
+        final Set<String> roles = ConfigurationUtil.getInstance().getList("kumuluzee.security.keycloak.roles-from-resources")
                 .map(resourceNames -> resourceNames.stream()
                         .map(accessToken::getResourceAccess)
                         .filter(Objects::nonNull)
@@ -114,27 +114,5 @@ public class KeycloakSecurityProcessorUtilImpl implements SecurityProcessorUtil 
         Principal principal = httpServletRequest.getUserPrincipal();
         if (principal == null)
             throw new NotAuthorizedException(Response.status(Response.Status.UNAUTHORIZED).build());
-    }
-
-    private static Optional<List<String>> getConfigList(String key) {
-        ConfigurationUtil cfg = ConfigurationUtil.getInstance();
-
-        Optional<Integer> listSize = cfg.getListSize(key);
-
-        if (listSize.isPresent()) {
-            List<String> list = new ArrayList<>();
-
-            for (int i = 0; i < listSize.get(); i++) {
-                Optional<String> item = cfg.get(key + "[" + i + "]");
-
-                item.ifPresent(list::add);
-            }
-
-            if (list.size() > 0) {
-                return Optional.of(Collections.unmodifiableList(list));
-            }
-        }
-
-        return Optional.empty();
     }
 }
