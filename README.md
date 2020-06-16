@@ -36,6 +36,31 @@ an environment variable, file property or config server entry (if using the Kumu
 etcd/Consul). Please refer to KumuluzEE Config for more information. Optionally you can also provide the configuration 
 in code using the `@Keycloak` annotation. 
 
+Example of configuration with **keycloak.json** as string value:
+```yaml
+security:
+    keycloak:
+        json: '{
+            "realm": "master",
+            "bearer-only": true,
+            "auth-server-url": "http://localhost:8082/auth",
+            "ssl-required": "external",
+            "resource": "customers-api",
+            "confidential-port": 0
+        }'
+```
+
+Using **keycloak.json** fields directly in yaml is also supported:
+```yaml
+security:
+    keycloak:
+      realm: "master"
+      bearer-only: true
+      auth-server-url: "http://localhost:8082/auth"
+      ssl-required: "external"
+      resource: "customers-api"
+```
+
 Example of security configuration with configuration override:
 ```java
 @DeclareRoles({"user", "admin"})
@@ -129,6 +154,18 @@ kumuluzee:
     keycloak:
       config-resolver: foo.bar.MyKeycloakConfigResolver
 ```
+
+## Realm and client based roles
+
+By default, realm roles are evaluated and client roles are ignored. You can change the configuration to use client roles instead by using `roles-from-resources` config key and an array of clients.
+```yaml
+security:
+    keycloak:
+      roles-from-resources:
+        - "customers-api"
+```
+
+It is not possible to evaluate realm and client roles at the same time since `@RolesAllowed` accepts a plain string and has no knowledge of role origin. The choice is exclusive.
 
 ## Changelog
 
