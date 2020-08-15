@@ -10,6 +10,7 @@
     <modules>
         <module>common</module>
         <module>keycloak</module>
+        <module>firebase</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -56,6 +57,11 @@
             <id>osbeorn</id>
             <email>kastelic.benjamin@gmail.com</email>
             <url>https://github.com/osbeorn</url>
+        </developer>
+        <developer>
+            <name>Miha Jamsek</name>
+            <id>Jamsek-m</id>
+            <url>https://github.com/Jamsek-m</url>
         </developer>
     </developers>
 
