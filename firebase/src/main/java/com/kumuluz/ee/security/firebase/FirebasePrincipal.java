@@ -100,11 +100,15 @@ public class FirebasePrincipal implements Principal {
                         .map(role -> (String) role)
                         .collect(Collectors.toSet());
                 } catch (ClassCastException e) {
-                    LOG.log(Level.SEVERE, "Role claim '{0}' is not an array of strings!", roleClaimName);
+                    LOG.log(Level.SEVERE, "Role claim ''{0}'' is not an array of strings!", roleClaimName);
                     return Collections.emptySet();
                 }
+            } else {
+                LOG.log(Level.SEVERE, "Role claim ''{0}'' is not an array of strings!", roleClaimName);
+                return Collections.emptySet();
             }
         }
+        
         return Collections.emptySet();
     }
 }
