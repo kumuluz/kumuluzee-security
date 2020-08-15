@@ -26,12 +26,16 @@ import com.google.firebase.FirebaseOptions;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Miha Jamsek
  * @since 1.3.0
  */
 public class FirebaseConfig {
+    
+    private static final Logger LOG = Logger.getLogger(FirebaseConfig.class.getName());
     
     private static String roleClaimName;
     private static boolean onlyVerifiedEmail;
@@ -50,7 +54,7 @@ public class FirebaseConfig {
             onlyVerifiedEmail = configUtil.getBoolean("kumuluzee.security.firebase.only-verified-email").orElse(false);
             
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.severe("Error reading google credentials for Firebase Authentication! Environment variable 'GOOGLE_APPLICATION_CREDENTIALS' must point to a valid google credentials JSON file.");
         }
     }
     
