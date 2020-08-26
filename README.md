@@ -6,82 +6,24 @@
 KumuluzEE Security is a security project for the KumuluzEE microservice framework. It provides support for OpenID 
 authentication through standard Java EE security annotations for roles. It is specifically targeted towards securing 
 REST services. Roles are mapped to the selected OpenID provider. KumuluzEE Security has been designed to work with 
-different OpenID providers. Currently only Keycloak is supported. Contributions for other OpenID providers are welcome.
+different OpenID providers. 
 
-## Usage
+## Providers
 
-You can enable the KumuluzEE Security authentication with Keycloak by adding the following dependencies:
+Currently, the following providers are supported:
+* [Keycloak](/keycloak/README.md)
+* [Firebase](/firebase/README.md)
 
-```xml
-<dependency>
-    <groupId>com.kumuluz.ee.security</groupId>
-    <artifactId>kumuluzee-security-keycloak</artifactId>
-    <version>${kumuluzee-security.version}</version>
-</dependency>
-<dependency>
-    <groupId>org.keycloak</groupId>
-    <artifactId>keycloak-jetty94-adapter</artifactId>
-    <version>${keycloak.version}</version>
-</dependency>
-```
+Contributions for other OpenID providers are welcome.
 
-The `keycloak.version` property should match the version of keycloak that is used.
-
-### Security configuration
+## Security configuration
 
 To protect a REST service using KumuluzEE Security authentication you have to annotate the REST application class with 
-the `@DeclareRoles` annotation. When using the `@DeclareRoles` annotation the Keycloak configuration (**keycloak.json**) 
-has to be provided with configuration key `kumuluzee.security.keycloak.json`. The configuration key can be defined as 
-an environment variable, file property or config server entry (if using the KumuluzEE Config project with support for 
-etcd/Consul). Please refer to KumuluzEE Config for more information. Optionally you can also provide the configuration 
-in code using the `@Keycloak` annotation. 
-
-Example of configuration with **keycloak.json** as string value:
-```yaml
-security:
-    keycloak:
-        json: '{
-            "realm": "master",
-            "bearer-only": true,
-            "auth-server-url": "http://localhost:8082/auth",
-            "ssl-required": "external",
-            "resource": "customers-api",
-            "confidential-port": 0
-        }'
-```
-
-Using **keycloak.json** fields directly in yaml is also supported:
-```yaml
-security:
-    keycloak:
-      realm: "master"
-      bearer-only: true
-      auth-server-url: "http://localhost:8082/auth"
-      ssl-required: "external"
-      resource: "customers-api"
-```
-
-Example of security configuration with configuration override:
-```java
-@DeclareRoles({"user", "admin"})
-@Keycloak(json =
-        "{" +
-        "  \"realm\": \"customers\"," +
-        "  \"bearer-only\": true," +
-        "  \"auth-server-url\": \"https://localhost:8082/auth\"," +
-        "  \"ssl-required\": \"external\"," +
-        "  \"resource\": \"customers-api\"" +
-        "}"
-)
-@ApplicationPath("v1")
-public class CustomerApplication extends Application {
-}
-```
-
+the `@DeclareRoles` annotation.
 It is possible to specify security constraints for JAX-RS resources using the standard `@DenyAll`, `@PermitAll` and
 `@RolesAllowed` Java annotations.
  
- Example of security constraints:
+Example of security constraints:
  ```java
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -131,7 +73,7 @@ public class CustomerResource {
 ``` 
 
 When using the CDI based security it is also possible to provide application role mappings. The specified role mappings 
-transform Keycloak roles into internal application roles. Role mappings are defined using the `kumuluzee.security.roles`
+transform provider roles into internal application roles. Role mappings are defined using the `kumuluzee.security.roles`
 key.
 
 Example role mapping configuration:
@@ -139,33 +81,13 @@ Example role mapping configuration:
 kumuluzee:
   security:
     roles:
-      user: role_user
+      user: role_user # 'user' from provider will be mapped to 'role_user' in this service
       admin: role_admin
 ```
 
+## Additional configuration
+
 You may also disable Jetty servlet security, which is enabled by default, by setting key `kumuluzee.security.disable-jetty-auth` to `true`.
-
-You can set a custom config resolver class (see [here](https://www.keycloak.org/docs/latest/securing_apps/index.html#config_external_adapter)) to be able to tweak Keycloak configuration at runtime for each request (for multitenant or purposes). Note that this class must implement `org.keycloak.adapters.KeycloakConfigResolver`.
-
-Example custom config resolver configuration:
-```yaml
-kumuluzee:
-  security:
-    keycloak:
-      config-resolver: foo.bar.MyKeycloakConfigResolver
-```
-
-## Realm and client based roles
-
-By default, realm roles are evaluated and client roles are ignored. You can change the configuration to use client roles instead by using `roles-from-resources` config key and an array of clients.
-```yaml
-security:
-    keycloak:
-      roles-from-resources:
-        - "customers-api"
-```
-
-It is not possible to evaluate realm and client roles at the same time since `@RolesAllowed` accepts a plain string and has no knowledge of role origin. The choice is exclusive.
 
 ## Changelog
 
