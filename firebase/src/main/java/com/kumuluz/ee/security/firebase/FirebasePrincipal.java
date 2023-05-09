@@ -97,7 +97,7 @@ public class FirebasePrincipal implements Principal {
             } else if (roleClaim instanceof Collection<?>) {
                 try {
                     return ((Collection<?>) roleClaim).stream()
-                        .map(role -> (String) role)
+                        .map(String.class::cast)
                         .collect(Collectors.toSet());
                 } catch (ClassCastException e) {
                     LOG.log(Level.SEVERE, "Role claim ''{0}'' is not an array of strings!", roleClaimName);

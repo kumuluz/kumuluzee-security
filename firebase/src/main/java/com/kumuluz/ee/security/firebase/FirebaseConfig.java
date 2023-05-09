@@ -26,7 +26,6 @@ import com.google.firebase.FirebaseOptions;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -39,11 +38,12 @@ public class FirebaseConfig {
     
     private static String roleClaimName;
     private static boolean onlyVerifiedEmail;
+    private static boolean checkRevocationList;
     
     public static void initialize() {
         try {
             
-            FirebaseOptions options = new FirebaseOptions.Builder()
+            FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.getApplicationDefault())
                 .build();
             
@@ -51,6 +51,7 @@ public class FirebaseConfig {
             
             ConfigurationUtil configUtil = ConfigurationUtil.getInstance();
             roleClaimName = configUtil.get("kumuluzee.security.firebase.role-claim").orElse("roles");
+            checkRevocationList = configUtil.getBoolean("kumuluzee.security.firebase.check-revoked").orElse(false);
             onlyVerifiedEmail = configUtil.getBoolean("kumuluzee.security.firebase.only-verified-email").orElse(false);
             
         } catch (IOException e) {
@@ -64,6 +65,14 @@ public class FirebaseConfig {
     
     public static boolean onlyVerifiedEmail() {
         return onlyVerifiedEmail;
+    }
+    
+    public static boolean checkRevoked() {
+        return checkRevocationList;
+    }
+    
+    private FirebaseConfig() {
+        // Hidden constructor
     }
     
 }
