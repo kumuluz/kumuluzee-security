@@ -15,7 +15,7 @@
     <artifactId>kumuluzee-security-firebase</artifactId>
 
     <properties>
-        <firebase-sdk.version>6.16.0</firebase-sdk.version>
+        <firebase-sdk.version>9.1.1</firebase-sdk.version>
     </properties>
 
     <dependencies>

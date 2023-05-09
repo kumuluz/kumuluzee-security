@@ -92,8 +92,6 @@ public class FirebaseSecurityProcessorUtilImpl implements SecurityProcessorUtil 
     
     @Override
     public void processPermitAll() {
-        Principal principal = httpServletRequest.getUserPrincipal();
-        if (principal == null)
-            throw new NotAuthorizedException(Response.status(Response.Status.UNAUTHORIZED).build());
+        processAuthentication();
     }
 }

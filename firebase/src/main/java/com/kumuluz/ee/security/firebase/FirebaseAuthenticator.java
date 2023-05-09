@@ -68,7 +68,7 @@ public class FirebaseAuthenticator implements Authenticator {
         
         try {
             
-            FirebaseToken parsedToken = FirebaseAuth.getInstance().verifyIdToken(token.get());
+            FirebaseToken parsedToken = FirebaseAuth.getInstance().verifyIdToken(token.get(), FirebaseConfig.checkRevoked());
             
             if (FirebaseConfig.onlyVerifiedEmail() && !parsedToken.isEmailVerified()) {
                 return Authentication.UNAUTHENTICATED;

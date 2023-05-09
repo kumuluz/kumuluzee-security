@@ -20,6 +20,7 @@
  */
 package com.kumuluz.ee.security.processor;
 
+import com.kumuluz.ee.security.annotations.FirebaseAuth;
 import com.kumuluz.ee.security.annotations.Keycloak;
 import com.kumuluz.ee.security.annotations.Secure;
 
@@ -54,7 +55,10 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     private Filer filer;
 
-    private List<Class<? extends Annotation>> securityProviders = Arrays.asList(Keycloak.class);
+    private final List<Class<? extends Annotation>> securityProviders = List.of(
+        Keycloak.class,
+        FirebaseAuth.class
+    );
 
     @Override
     public SourceVersion getSupportedSourceVersion() {

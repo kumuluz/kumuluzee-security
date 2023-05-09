@@ -31,3 +31,7 @@ In order to set name of the claim used for roles, we can provide a configuration
 ### Verified users
 Firebase, by default ignores user email validity. If we want to limit access only to users with verified email, we can provide
 a configuration entry with key `kumuluzee.security.firebase.only-verified-email` to `true` (defaults to `false`).
+
+### Check token revocation
+If `kumuluzee.security.firebase.check-revoked` is set to `true` (defaults to `false`), 
+Firebase will perform an additional check to see if the ID token has been revoked since it was issued. Beware, that this option requires making an additional remote API call.

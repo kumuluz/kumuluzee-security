@@ -19,7 +19,17 @@ Contributions for other OpenID providers are welcome.
 ## Security configuration
 
 To protect a REST service using KumuluzEE Security authentication you have to annotate the REST application class with 
-the `@DeclareRoles` annotation.
+the `@DeclareRoles` annotation:
+````java
+@DeclareRoles({"role1", "role2"})
+public class RestApplication extends Application {
+    
+}
+````
+
+Alternatively, you can also annotate it with `@Keycloak` or `@FirebaseAuth`.
+
+
 It is possible to specify security constraints for JAX-RS resources using the standard `@DenyAll`, `@PermitAll` and
 `@RolesAllowed` Java annotations.
  
