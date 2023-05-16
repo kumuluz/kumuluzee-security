@@ -39,6 +39,8 @@ public class FirebaseConfig {
     private static String roleClaimName;
     private static boolean onlyVerifiedEmail;
     private static boolean checkRevocationList;
+    private static boolean checkSessionRevocationList;
+    private static boolean enableSessionCookie;
     
     public static void initialize() {
         try {
@@ -53,6 +55,8 @@ public class FirebaseConfig {
             roleClaimName = configUtil.get("kumuluzee.security.firebase.role-claim").orElse("roles");
             checkRevocationList = configUtil.getBoolean("kumuluzee.security.firebase.check-revoked").orElse(false);
             onlyVerifiedEmail = configUtil.getBoolean("kumuluzee.security.firebase.only-verified-email").orElse(false);
+            checkSessionRevocationList = configUtil.getBoolean("kumuluzee.security.firebase.session.check-revoked").orElse(checkRevocationList);
+            enableSessionCookie = configUtil.getBoolean("kumuluzee.security.firebase.session.enabled").orElse(false);
             
         } catch (IOException e) {
             LOG.severe("Error reading google credentials for Firebase Authentication! Environment variable 'GOOGLE_APPLICATION_CREDENTIALS' must point to a valid google credentials JSON file.");
@@ -69,6 +73,14 @@ public class FirebaseConfig {
     
     public static boolean checkRevoked() {
         return checkRevocationList;
+    }
+    
+    public static boolean checkSessionRevoked() {
+        return checkSessionRevocationList;
+    }
+    
+    public static boolean allowSessionCookie() {
+        return enableSessionCookie;
     }
     
     private FirebaseConfig() {
