@@ -6,7 +6,7 @@
 
     <groupId>com.kumuluz.ee.security</groupId>
     <artifactId>kumuluzee-security</artifactId>
-    <version>1.3.0-SNAPSHOT</version>
+    <version>1.3.0</version>
     <modules>
         <module>common</module>
         <module>keycloak</module>
