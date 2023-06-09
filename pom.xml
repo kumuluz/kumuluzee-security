@@ -47,28 +47,17 @@
 
     <developers>
         <developer>
-            <name>Tilen Faganel</name>
-            <id>tfaga</id>
-            <email>tilen.faganel@me.com</email>
-            <url>https://github.com/TFaga</url>
-        </developer>
-        <developer>
-            <name>Benjamin Kastelic</name>
-            <id>osbeorn</id>
-            <email>kastelic.benjamin@gmail.com</email>
-            <url>https://github.com/osbeorn</url>
-        </developer>
-        <developer>
-            <name>Miha Jamsek</name>
-            <id>Jamsek-m</id>
-            <url>https://github.com/Jamsek-m</url>
+            <name>KumuluzEE Development Team</name>
+            <id>kumuluz</id>
+            <email>info@kumuluz.com</email>
+            <url>https://github.com/kumuluz</url>
         </developer>
     </developers>
 
     <licenses>
         <license>
             <name>MIT License</name>
-            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <url>https://www.opensource.org/licenses/mit-license.php</url>
         </license>
     </licenses>
 
